@@ -763,27 +763,65 @@ async function dispatchEmailReport(payload) {
     }
 
     // 2. Direct Web3Forms submission (Free & Serverless)
+    let emailSent = false;
     if (state.web3Key) {
-      const w3Response = await fetch('https://api.web3forms.com/submit', {
+      try {
+        const w3Response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: state.web3Key,
+            subject: `🏎️ [Vehicle Dynamics Quiz] ${payload.student.name} (${payload.score}/${payload.total} - ${payload.percentage}%)`,
+            from_name: 'AutoVroom Racing Community',
+            to_email: state.adminEmail,
+            name: payload.student.name,
+            email: payload.student.email,
+            phone: payload.student.phone,
+            message: formatTextReport(payload)
+          })
+        });
+
+        const w3Data = await w3Response.json();
+        if (w3Data.success) {
+          emailSent = true;
+          markEmailSuccess(state.adminEmail);
+          return;
+        }
+      } catch (e) {
+        console.warn('Web3Forms client warning:', e);
+      }
+    }
+
+    // 2.5 Dual-Dispatch via FormSubmit (Direct to Email without key)
+    try {
+      const fsRes = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(state.adminEmail)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
-          access_key: state.web3Key,
-          subject: `🏎️ [Vehicle Dynamics Quiz] ${payload.student.name} (${payload.score}/${payload.total} - ${payload.percentage}%)`,
-          from_name: 'AutoVroom Racing Community',
-          to_email: state.adminEmail,
-          name: payload.student.name,
-          email: payload.student.email,
-          phone: payload.student.phone,
-          message: formatTextReport(payload)
+          _subject: `🏎️ [Vehicle Dynamics] نتيجة: ${payload.student.name} (${payload.score}/${payload.total})`,
+          _captcha: 'false',
+          'اسم الطالب': payload.student.name,
+          'Student ID': payload.student.studentId,
+          'الكلية': payload.student.faculty,
+          'الفرقة': payload.student.level,
+          'البريد الإلكتروني': payload.student.email,
+          'الهاتف': payload.student.phone,
+          'الدرجة': `${payload.score} من ${payload.total} (${payload.percentage}%)`,
+          'الوقت': payload.timeSpent,
+          'تقرير الإجابات': formatTextReport(payload)
         })
       });
 
-      const w3Data = await w3Response.json();
-      if (w3Data.success) {
+      const fsData = await fsRes.json();
+      if (fsData.success === 'true' || fsData.success === true) {
         markEmailSuccess(state.adminEmail);
         return;
       }
+    } catch (e) {
+      console.warn('FormSubmit client warning:', e);
     }
 
     // 3. Custom Webhook
