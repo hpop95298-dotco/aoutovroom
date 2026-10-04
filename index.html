@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Dynamics Applicant Quiz — AutoVroom Racing Cars Community</title>
+  <meta name="description" content="Vehicle Dynamics Applicant Quiz - AutoVroom Racing Cars Community, Innovation University. 12 Questions | Total 12 Marks">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/logo.jpg">
+
+  <!-- Google Fonts: Cairo & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- SheetJS (xlsx) for Genuine Excel File Export (.xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+</head>
+<body>
+
+  <!-- Top Sticky Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="assets/logo.jpg" alt="AutoVroom Logo" class="brand-logo-img">
+        <div class="brand-info">
+          <h1>AutoVroom <span class="brand-badge">Dynamics</span></h1>
+          <p>Vehicle Dynamics Applicant Quiz &bull; Innovation University</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Live Countdown Timer -->
+        <div id="quizTimer" class="timer-box" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="timerText">25:00</span>
+        </div>
+
+        <!-- Admin Excel Dashboard Button -->
+        <button id="btnOpenAdmin" class="btn btn-secondary btn-sm" title="لوحة النتائج وتصدير الإكسيل">
+          <span>📊</span>
+          <span>شيت النتائج (Excel)</span>
+        </button>
+
+        <!-- Instructor Settings Button -->
+        <button id="btnOpenSettings" class="icon-btn" title="إعدادات استقبال الإيميل" aria-label="الإعدادات">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Progress Bar during quiz -->
+    <div id="stickyProgress" class="sticky-progress" style="display: none;">
+      <div class="header-inner" style="flex-direction: column; gap: 8px;">
+        <div class="progress-info" style="width: 100%;">
+          <span>تمت الإجابة على: <strong id="answeredCount">0</strong> من <strong id="totalCountHeader">12</strong></span>
+          <span id="percentageBadge" style="font-family: var(--font-english); font-weight: 800; color: #c084fc;">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <!-- Question Numbers Map (1-12) -->
+        <div id="questionsMap" class="questions-map" style="width: 100%;">
+          <!-- Generated via JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="container">
+
+    <!-- SCREEN 1: WELCOME & REGISTRATION -->
+    <section id="welcomeScreen" class="welcome-hero">
+      
+      <!-- Top Banner Image -->
+      <div class="banner-card">
+        <img src="assets/banner.jpg" alt="AutoVroom Futuristic Banner" class="banner-img">
+        <div class="banner-overlay">
+          <span class="banner-tag">⚡ INNOVATION UNIVERSITY &bull; AUTODYNAMICS</span>
+          <h2 class="banner-title">AutoVroom Racing Cars Community</h2>
+          <p class="banner-subtitle">Eng. Anas Essam | Operation Manager &bull; Vehicle Dynamics Subteam</p>
+        </div>
+      </div>
+
+      <div class="hero-pill">
+        <span>🏎️ Vehicle Dynamics Applicant Quiz</span>
+      </div>
+      
+      <h1 class="hero-title">
+        اختبار القبول والتقييم — <span>12 سؤال</span>
+      </h1>
+      
+      <p class="hero-desc">
+        مرحباً بك في اختبار تقييم المتقدمين لفريق ديناميكا السيارات (Vehicle Dynamics). يتم تصحيح إجاباتك فورياً وإرسال تقرير النتيجة التفصيلي آلياً إلى بريد إدارة الفريق.
+      </p>
+
+      <!-- Official Quiz Instruction from the Paper -->
+      <div class="official-notice">
+        <div class="notice-icon">📌</div>
+        <div class="notice-text">
+          <h4>تعليمات الاختبار الرسمية (Instructions):</h4>
+          <p>
+            • <strong>Search is allowed.</strong> Work individually and use your own words.<br>
+            • You may answer in Arabic or English.<br>
+            • Circle one option for Questions 1–12 (كل سؤال له درجة واحدة بإجمالي 12 درجة).
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats ribbon -->
+      <div class="stats-ribbon">
+        <div class="stat-item">
+          <div class="stat-icon">🏎️</div>
+          <div class="stat-val">12</div>
+          <div class="stat-label">سؤال تخصصي (MCQ)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-val">12</div>
+          <div class="stat-label">الدرجة الكلية (Marks)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-val">25</div>
+          <div class="stat-label">دقيقة وقت الاختبار</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">📧</div>
+          <div class="stat-val">فوري</div>
+          <div class="stat-label">إرسال للإيميل + PDF</div>
+        </div>
+      </div>
+
+      <!-- Registration Form Card (Matching Paper Fields) -->
+      <div class="glass-card" style="text-align: right; max-width: 720px; margin: 0 auto;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 20px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+          <span>👤</span> بيانات المتقدم للاختبار (Applicant Information)
+        </h2>
+
+        <form id="studentForm">
+          <div class="form-grid">
+            <!-- Name -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="studentName">الاسم بالكامل (Name) <span class="required">*</span></label>
+              <input type="text" id="studentName" class="form-input" placeholder="مثال: أنس عصام / Anas Essam" required>
+            </div>
+
+            <!-- Student ID -->
+            <div class="form-group">
+              <label for="studentId">رقم القيد الجامعي (Student ID) <span class="required">*</span></label>
+              <input type="text" id="studentId" class="form-input" placeholder="مثال: 20240189" required>
+            </div>
+
+            <!-- Level -->
+            <div class="form-group">
+              <label for="studentLevel">الفرقة الدراسية (Level) <span class="required">*</span></label>
+              <input type="text" id="studentLevel" class="form-input" placeholder="مثال: Level 1 / الفرقة الثانية" required>
+            </div>
+
+            <!-- Faculty / Major -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="facultyMajor">الكلية / التخصص (Faculty / Major) <span class="required">*</span></label>
+              <input type="text" id="facultyMajor" class="form-input" placeholder="مثال: هندسة ميكاترونكس / هندسة سيارات / حاسبات" required>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="studentEmail">البريد الإلكتروني (Email) <span class="required">*</span></label>
+              <input type="email" id="studentEmail" class="form-input" placeholder="student@example.com" required>
+            </div>
+
+            <!-- Phone / WhatsApp -->
+            <div class="form-group">
+              <label for="studentPhone">رقم الواتساب للتواصل <span class="required">*</span></label>
+              <input type="tel" id="studentPhone" class="form-input" placeholder="010XXXXXXXX" required>
+            </div>
+
+            <!-- Date -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="quizDate">التاريخ (Date)</label>
+              <input type="text" id="quizDate" class="form-input" readonly>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" style="font-size: 1.15rem; padding: 16px;">
+            <span>بدء الاختبار الآن (Start Quiz)</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: ACTIVE QUIZ VIEW -->
+    <section id="quizScreen" style="display: none;">
+      
+      <!-- View Mode Switcher -->
+      <div class="view-switch-bar">
+        <span>طريقة عرض الأسئلة:</span>
+        <div class="view-toggle">
+          <button id="modeStepBtn" class="toggle-opt active" type="button">سؤال بسؤال (Step-by-Step)</button>
+          <button id="modeAllBtn" class="toggle-opt" type="button">كل الأسئلة معاً (All 12)</button>
+        </div>
+      </div>
+
+      <!-- Single Question Container (Step-by-Step Mode) -->
+      <div id="singleQuestionArea">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- All Questions Container (Scroll Mode) -->
+      <div id="allQuestionsArea" style="display: none;">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Action Footer -->
+      <div class="quiz-nav-actions" style="margin-top: 30px;">
+        <button id="btnPrevQuestion" class="btn btn-secondary" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+          <span>السابق (Previous)</span>
+        </button>
+
+        <button id="btnNextQuestion" class="btn btn-primary" type="button">
+          <span>التالي (Next)</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <button id="btnSubmitQuiz" class="btn btn-success" type="button" style="display: none;">
+          <span>تسليم ومراجعة الاختبار (Submit Quiz)</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- SCREEN 3: RESULTS & REPORT -->
+    <section id="resultScreen" style="display: none;">
+      
+      <div class="glass-card result-hero">
+        <div class="hero-pill">
+          <span>🎉 اكتمل الاختبار بنجاح</span>
+        </div>
+
+        <div id="scoreCircle" class="score-circle">
+          <span id="finalScoreVal" class="score-num">0</span>
+          <span class="score-total">من 12 درجة</span>
+        </div>
+
+        <div id="resultBadge" class="result-badge excellent">
+          <!-- Text by JS -->
+        </div>
+
+        <h2 id="studentGreeting" style="font-size: 1.6rem; color: #ffffff; margin-bottom: 6px;">
+          <!-- Name by JS -->
+        </h2>
+        
+        <p id="resultSummary" style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px;">
+          <!-- Time and percentage summary -->
+        </p>
+
+        <!-- Email Delivery Status Card -->
+        <div id="emailStatusCard" class="email-status-card">
+          <div id="emailStatusIcon" class="email-status-icon">⏳</div>
+          <div style="flex-grow: 1;">
+            <div id="emailStatusTitle" style="font-weight: 800; font-size: 1.05rem; color: #ffffff;">
+              جاري إرسال النتيجة إلى بريد الفريق...
+            </div>
+            <div id="emailStatusDesc" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+              يتم الآن تسليم التقرير الإلكتروني المفصل بالدرجات إلى إدارة الفريق.
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Info Snapshot Card -->
+        <div id="studentInfoSummary" style="background: rgba(14, 10, 34, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; margin: 20px 0; text-align: right;">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px;">
+          <button id="btnPrintReport" class="btn btn-secondary" type="button">
+            <span>🖨️ طباعة النتيجة / حفظ PDF</span>
+          </button>
+          
+          <button id="btnCopyReport" class="btn btn-secondary" type="button">
+            <span>📋 نسخ ملخص النتيجة</span>
+          </button>
+
+          <a id="btnWhatsAppShare" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+            <span>💬 مشاركة عبر واتساب</span>
+          </a>
+
+          <button id="btnResendEmail" class="btn btn-secondary" type="button">
+            <span>🔄 إعادة إرسال للإيميل</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Educational Review Section -->
+      <div class="review-controls">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff;">
+          🔍 مراجعة الإجابات والحل النموذجي (مع الشرح الهندسي)
+        </h3>
+        
+        <div class="filter-btn-group">
+          <button id="filterAll" class="filter-btn active" type="button">الكل (12)</button>
+          <button id="filterCorrect" class="filter-btn" type="button">الصحيحة</button>
+          <button id="filterWrong" class="filter-btn" type="button">الخاطئة</button>
+        </div>
+      </div>
+
+      <!-- List of Questions with Student Choice, Correct Choice & Official Reason -->
+      <div id="answersReviewContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- CONFIRM SUBMIT MODAL -->
+  <div id="submitModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>تأكيد تسليم الاختبار</h3>
+        <button id="btnCloseModal" class="btn-close-modal" type="button">✕</button>
+      </div>
+      
+      <div id="modalBody" style="margin-bottom: 24px;">
+        <!-- Filled by JS -->
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="btnCancelSubmit" class="btn btn-secondary" type="button">متابعة الحل</button>
+        <button id="btnConfirmSubmit" class="btn btn-success" type="button">نعم، سلّم الآن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTRUCTOR SETTINGS MODAL -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⚙️ إعدادات استقبال الإيميل (Email Settings)</h3>
+        <button id="btnCloseSettings" class="btn-close-modal" type="button">✕</button>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+          يمكنك تغيير الإيميل الذي يستقبل الإجابات وتفعيل مفتاح Web3Forms المجاني ليصلك إشعار فوري عند تسليم كل طالب.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="inputAdminEmail">بريدك الإلكتروني (المستلم):</label>
+          <input type="email" id="inputAdminEmail" class="form-input" placeholder="your-email@gmail.com">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="inputWeb3Key">مفتاح Web3Forms Access Key (مجاني):</label>
+          <input type="text" id="inputWeb3Key" class="form-input" placeholder="احصل عليه مجاناً من web3forms.com">
+          <small style="color: var(--text-purple); font-size: 0.8rem; margin-top: 4px;">
+            💡 سجل إيميلك في <a href="https://web3forms.com" target="_blank" style="color: #c084fc; text-decoration: underline;">web3forms.com</a> وسيصلك مفتاح مجاني في ثوانٍ لاستقبال الإيميلات مباشرة بدون أي خادم.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputWebhookUrl">Webhook URL مخصص (Discord / Google Sheets) [اختياري]:</label>
+          <input type="url" id="inputWebhookUrl" class="form-input" placeholder="https://maker.ifttt.com/... أو Discord webhook">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="btnSaveSettings" class="btn btn-primary" type="button">حفظ التغييرات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN EXCEL & RESULTS DASHBOARD MODAL -->
+  <div id="adminModal" class="modal-overlay">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">📊</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem;">شيت درجات وإجابات الطلاب — AutoVroom</h3>
+            <p style="margin: 2px 0 0; font-size: 0.82rem; color: var(--text-purple);">تجميع وتصدير كافة الإجابات والداتا إلى Excel (.xlsx) و Google Sheets</p>
+          </div>
+        </div>
+        <button id="btnCloseAdmin" class="btn-close-modal" type="button">✕</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-tabs">
+        <button id="tabSubmissionsBtn" class="admin-tab-btn active" type="button">📋 قائمة الإجابات والدرجات</button>
+        <button id="tabGoogleSheetBtn" class="admin-tab-btn" type="button">⚡ الربط التلقائي بـ Google Sheets</button>
+      </div>
+
+      <!-- TAB 1: SUBMISSIONS & EXCEL EXPORT -->
+      <div id="tabSubmissionsContent">
+        <!-- Live Quick Stats -->
+        <div class="admin-stats-bar">
+          <div class="admin-stat-card">
+            <div id="statTotalStudents" class="admin-stat-num">0</div>
+            <div class="admin-stat-title">إجمالي المتقدمين</div>
+          </div>
+          <div class="admin-stat-card">
+            <div id="statAvgScore" class="admin-stat-num">0.0</div>
+            <div class="admin-stat-title">متوسط الدرجات (من 12)</div>
+          </div>
+          <div class="admin-stat-card">
+            <div id="statPassRate" class="admin-stat-num">0%</div>
+            <div class="admin-stat-title">نسبة المؤهلين (&ge; 50%)</div>
+          </div>
+          <div class="admin-stat-card">
+            <div id="statTopScore" class="admin-stat-num">0 / 12</div>
+            <div class="admin-stat-title">أعلى درجة مسجلة</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <input type="text" id="adminSearchInput" class="form-input" style="max-width: 280px; padding: 8px 12px; font-size: 0.88rem;" placeholder="🔍 بحث بالاسم أو Student ID...">
+          
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="btnExportExcelXlsx" class="btn btn-excel btn-sm" type="button">
+              <span>📗 تحميل شيت إكسيل (.xlsx)</span>
+            </button>
+            <button id="btnExportCsv" class="btn btn-secondary btn-sm" type="button">
+              <span>📄 تصدير CSV</span>
+            </button>
+            <button id="btnClearAllSubmissions" class="btn btn-secondary btn-sm" style="color: #f87171;" type="button" title="مسح السجلات المخزنة محلياً">
+              <span>🗑️ مسح</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submissions Table -->
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 30px; text-align: center;">#</th>
+                <th>اسم الطالب</th>
+                <th>رقم القيد (ID)</th>
+                <th>الكلية / التخصص</th>
+                <th>الفرقة</th>
+                <th>الدرجة</th>
+                <th>النسبة</th>
+                <th>الوقت</th>
+                <th>التاريخ</th>
+                <th>الإيميل</th>
+                <th>الواتساب</th>
+                <th style="text-align: center;">الإجراء</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubmissionsTbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: GOOGLE SHEETS LIVE INTEGRATION -->
+      <div id="tabGoogleSheetContent" style="display: none;">
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+          <h4 style="color: #34d399; margin-bottom: 6px; font-size: 0.95rem;">⚡ كيف يتم التجميع التلقائي في Google Sheets؟</h4>
+          <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+            يمكنك ربط هذا الموقع بشيت Google Sheet مباشر؛ وبمجرد أن يضغط أي طالب على "تسليم"، ينزل اسمه ودرجته وإجاباته الـ 12 تلقائياً في صف جديد داخل الشيت في نفس اللحظة!
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="inputGoogleSheetWebhook">رابط Google Sheets Webhook App URL:</label>
+          <input type="url" id="inputGoogleSheetWebhook" class="form-input" placeholder="https://script.google.com/macros/s/.../exec">
+          <small style="color: var(--text-purple); font-size: 0.8rem; margin-top: 4px;">
+            ألصق رابط الـ Webhook الخاص بـ Google Sheet هنا لحفظ أي نتيجة مباشرة.
+          </small>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <button id="btnSaveGoogleSheetWebhook" class="btn btn-primary btn-sm" type="button">حفظ الرابط</button>
+          <button id="btnTestGoogleSheetWebhook" class="btn btn-secondary btn-sm" type="button">🧪 إرسال صف تجريبي للشيت</button>
+        </div>
+
+        <details style="background: #110c29; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-top: 10px;">
+          <summary style="cursor: pointer; font-weight: 700; color: #c084fc; font-size: 0.88rem;">
+            📜 اضغط هنا لنسخ كود الربط السريع (Google Apps Script) في 30 ثانية
+          </summary>
+          <div style="margin-top: 10px;">
+            <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 6px;">
+              1. افتح أي شيت جديد على <strong>Google Sheets</strong> &gt; اضغط على <strong>Extensions (الإضافات)</strong> &gt; <strong>Apps Script</strong>.<br>
+              2. احذف كل المكتوب هناك وضع الكود التالي ثم اضغط <strong>Deploy &gt; New deployment &gt; Web app (Anyone)</strong>:
+            </p>
+            <div class="code-box" id="googleScriptCodeSnippet">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "تاريخ ووقت التسليم", "اسم الطالب", "رقم القيد", "الكلية / التخصص", "الفرقة",
+      "البريد الإلكتروني", "الهاتف / واتساب", "الدرجة (من 12)", "النسبة المئوية", "الوقت المستغرق",
+      "س1", "س2", "س3", "س4", "س5", "س6", "س7", "س8", "س9", "س10", "س11", "س12"
+    ]);
+    sheet.getRange(1, 1, 1, 22).setFontWeight("bold").setBackground("#7c3aed").setFontColor("#ffffff");
+  }
+  var data = JSON.parse(e.postData.contents);
+  var row = [
+    data.date || new Date().toLocaleString(),
+    data.name,
+    data.studentId,
+    data.faculty,
+    data.level,
+    data.email,
+    data.phone,
+    data.score,
+    data.percentage + "%",
+    data.timeSpent
+  ];
+  if (data.answers && data.answers.length) {
+    data.answers.forEach(function(a) {
+      row.push(a.userChoiceLetter + " (" + (a.isCorrect ? "صحيحة" : "خاطئة") + ")");
+    });
+  }
+  sheet.appendRow(row);
+  return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+            <button id="btnCopyGoogleScript" class="btn btn-secondary btn-sm" style="margin-top: 6px;" type="button">📋 نسخ كود Script</button>
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="toast">
+    <span id="toastIcon">🚀</span>
+    <span id="toastMsg">تم بنجاح!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
